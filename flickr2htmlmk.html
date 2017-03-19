@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"> 
+<html lang="ja"> 
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
+<title>Flickr2HTMLメーカー</title> 
+<script type="text/javascript"> 
+<!--
+function bmCreate() {
+	var d = document;
+ 
+	// エラーハンドリング
+	if (!d.getElementById("code").value) {
+		alert("書式テンプレートの選択が必要です!!");
+		return;
+	}
+ 
+	// Bookmarklet（本体と引数定義）
+	var bmBase = 'http://dl.dropbox.com/u/290961/js/flickr2html.js';
+	var bmArg = "url+='&out='+'%out%'+'&api='+'%api%'+'&scs='+'%scs%'+'&typ='+'%typ%'+'&fmt='+'%fmt%';";
+ 
+	// Bookmarklet呼出（雛形）
+	var bmlt = "javascript:(function(){var d=document,e=d.createElement('script'),url='" + 
+	bmBase + "';if(!url.match(/\\?/))url+='?t='+(new%20Date()).getTime();" + bmArg + 
+	"e.charset='utf-8';e.src=url;e.id='bmlt';d.body.appendChild(e);})();";
+ 
+ 	// 出力先セレクタをセット
+ 	var selectOut = d.getElementById("select-out");
+    var outOptions = d.getElementById("select-out").options;
+    var outValue = outOptions.item(selectOut.selectedIndex).value;
+ 
+	// フォームの値をセット
+	bmlt = bmlt.replace("%out%", d.getElementById("out").value);
+	bmlt = bmlt.replace("%api%", d.getElementById("api").value);
+	bmlt = bmlt.replace("%scs%", d.getElementById("scs").value + d.getElementById("wid").value);
+	bmlt = bmlt.replace("%typ%", d.getElementById("typ").value);
+	bmlt = bmlt.replace("%fmt%", escape(d.getElementById("code").value));
+ 
+	// Bookmarkletブックマーク表示
+	var html = 
+	"<h2>個人向けBookmarklet</h2>" +
+	"<strong>デモおよびPC登録用：そのまま実行もしくは登録</strong><br>" +
+	'<a href="' + bmlt + '">' + d.getElementById("bmn").value + '</a><br>' +
+	"<br>" +
+	"<strong>iPhone登録用：登録後 ?以前を削除</strong><br>" +
+	'<a href="http://www.feelingplace.com/?' + bmlt + '">' + d.getElementById("bmn").value + '</a><br>' +
+	"<br>";
+	d.getElementById("bmHtml").innerHTML = html;
+}
+ 
+function bmClear() {
+	var d = document;
+	d.getElementById("bmHtml").innerHTML = "";
+}
+ 
+function clickKndr(value) {
+	var d = document;
+	d.getElementById("knd").value = value;
+}
+ 
+function clickOutr(value) {
+	var d = document;
+	d.getElementById("out").value = value;
+}
+ 
+function loadFmt() {
+	var d = document, fmtAry = ['fmt0', 'fmt1', 'fmt2', 'fmt3'], x = new Array(fmtAry);
+ 
+	x.fmt0 = '';
+ 
+	// 書式1（画像＋タイトル＋ユーザー名）
+	x.fmt1 = '<p><a href="${pageURL}" title="${title} by ${username}, on Flickr" target="_blank"><img class="flickr_photo" src="${imgURL}" alt="${title}" ${width}/></a><br /><cite class="flickr_photographer"><img src="http://farm4.static.flickr.com/3329/favicons/72157601614001242_7730.png" width="16" /><a href="${pageURL}">${title}</a> Photo by <a href="${userURL}">${username}</a></cite></p>';
+ 
+	// 書式2（画像のみ）
+	x.fmt2 = '<a href="${pageURL}" title="${title} by ${username}, on Flickr" target="_blank"><img class="flickr_photo" src="${imgURL}" alt="${title}" ${width}/></a>';
+ 
+	// 書式3（予約語一覧）
+	x.fmt3 = '<strong style="color:blue;">ユーザー名 ＄{username}</strong><br>${username}<br><br><strong style="color:blue;">ユーザーURL ＄{userURL}</strong><br>${userURL}<br><br><strong style="color:blue;">画像タイトル ＄{title}</strong><br>${title}<br><br><strong style="color:blue;">画像ID ＄{photoID}</strong><br>${photoID}<br><br><strong style="color:blue;">画像URL ＄{imgURL}</strong><br>${imgURL}<br><br><strong style="color:blue;">画像URL on Flickr ＄{pageURL}</strong><br>${pageURL}<br><br>';
+ 
+	// 選択された書式テンプレートをソース表示
+	d.getElementById("code").value = x[d.getElementById("fmt").value];
+}
+//-->
+</script> 
+</head> 
+<body style="margin:20px 0 0 30px" link="#3333FF" vlink="#3333FF"> 
+<div id="inputHtml"> 
+<h2>Flickr2HTMLメーカー</h2>
+<p>Flickr2HTMLとは、Flickrサイトの単一画像ページまたはsetページからブログに貼りつけるためのタグを取得するブックマークレットです。</p>
+<p>setから取得できる件数に制限はありませんが、プロンプトに表示できる文字数に制限がありますので、プロンプトでデータを取得する方は必ずしも全件取得できるとは限りませんのでご注意ください。</p>
+<p>また、privacyの設定はpublicになっていないと画像の取得ができませんのでご注意ください。（@molamo_19さん、ご指摘ありがとうございます！）</p>
+<form id="inputFrame"> 
+<strong>1.Bookmarklet名を入力して下さい</strong><br> 
+<input type="text" size="30" id="bmn" value="Flickr2HTML" onChange="javascript:bmClear();"><br> 
+<br> 
+<strong>2.FlickrAPIキー（要取得）を入力して下さい</strong><br>
+<input type="text" size="30" id="api" value="APIキーは必須入力です" onchange="javascript:bmClear();"><br>
+<a style="font-size: 85%;" target="_blank" href="http://blog.sinap.jp/2009/06/flickr-flash-vol1-api-key.html">FlickrAPIキー取得方法はこちらを参考にして下さいヽ(´ー`)ﾉ</a><br><br>
+<strong>3.Flickr画像の解像度とピクセル（数字）を選択して下さい</strong><br>
+<select id="typ" onchange="javascript:bmClear();"> 
+<option value='L'>Large（長辺1200）</option> 
+<option value='M640'>Medium（長辺640）</option> 
+<option value='M500' selected>Medium（長辺500）</option> 
+<option value='S'>Small（長辺240）</option> 
+<option value='T'>Tumbnail（長辺100）</option> 
+<option value='Sq'>Square（縦横75）</option> 
+</select>
+<input type="text" size="10" id="scs" value="288" onChange="javascript:bmClear();">
+<select id="wid" onchange="javascript:bmClear();"> 
+<option value='' selected>長辺を判定（px）</option> 
+<option value='px'>width固定（px）</option> 
+<option value='%'>width固定（%）</option> 
+</select><br>
+<span style="font-size: 85%;">ピクセルを0（または空）にするとwidthは設定されません</span><br> 
+<span style="font-size: 85%;">無料会員の場合、Medium500より小さい解像度でしか設定できません</span><br> 
+<br> 
+<strong>4.出力方法を選択して下さい</strong><br>
+<select id="select-out" onchange="javascript:clickOutr(this.value);bmClear();">
+<option value=''>（出力先）</option>
+<option value='preview'>プレビュー表示</option>
+<option value='popup'>ポップアップ</option>
+<option value='pop-textforce'>ポップアップ→Textforce</option>
+<option value='textforce'>Textforce</option>
+<option value='safari-textforce'>Textforce→Safari</option>
+<option value='draftpad'>DraftPad</option>
+<option value='slpro'>するぷろ</option>
+<option value='moblogger'>Moblogger</option>
+<option value='moblogger-app'>Moblogger(追記)</option>
+<option value='moblogger-pb'>Moblogger(コピー)</option>
+<option value='myeditor'>MyEditor</option>
+<option value='myeditor-cursor'>MyEditor(カーソル)</option>
+<option value='rowline'>Rowline</option>
+<option value='msth'>TextHandler</option>
+<option value='thumbedit'>ThumbEdit(送信)</option>
+<option value='thumbedit-insert'>ThumbEdit(追記)</option>
+<option value='presssync'>PressSync Pro</option>
+<option value='textwell'>Textwell</option>
+<option value='hatenablog'>はてなブログ（新規投稿）</option>
+<option value='drafts'>Drafts</option>
+<option value='drafts4'>Drafts4</option>
+<option value='ameeditor'>AmeEditor</option>
+<option value='slpro-x'>SLPRO X</option>
+</select>
+<input type="hidden" id="out" value="preview"><br>
+<br> 
+<strong>5.書式テンプレートを選択して下さい</strong><br>
+<select id="fmt" onchange="javascript:loadFmt();bmClear();"> 
+<option value='fmt0' selected>書式テンプレートを選択して下さい</option> 
+<option value='fmt1'>画像＋タイトル＋ユーザー名</option> 
+<option value='fmt2'>画像のみ</option> 
+<option value='fmt3'>予約語一覧</option> 
+</select><br><p>2015年9月1日追記：Flickr 新埋め込み形式用の Flickr2HTML のテンプレートを作っていただきました。詳細はこちらの記事、<a href="http://masagrant55.hatenablog.com/entry/2015/08/30/222531">ブックマークレット「Flickr2HTML」用テンプレートURLを作った - always one step forward</a>をご覧ください。</p>
+<br> 
+<strong>以下を直接カスタマイズすることもできます（但し ' は禁止文字）</strong><br> 
+<textarea id="code" style="width:410px;height:100px;padding:2px;" onchange="javascript:bmClear();"></textarea><br> 
+<strong style="font-size: 85%;color: red;">プレビュー表示でデモするとカスタマイズ書式は消えちゃうので注意を!!</strong><br> 
+<br> 
+<input type="button" value="Bookmarkletを生成する" id="buttonShow" onclick="javascript:bmCreate();"> 
+</form></div> 
+<div id="bmHtml"></div> 
+</body> 
+</html> 
